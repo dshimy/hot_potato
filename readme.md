@@ -66,18 +66,20 @@ Each faucet is a ruby file in the app directory that extends HotPotato::Faucet a
 the perform method.  For each message received, the method should call the send_message to send
 it to the next AppTask.
 
-		class TwitterFaucet < HotPotato::Faucet
+```ruby
+class TwitterFaucet < HotPotato::Faucet
 
-		  def perform
-		    TweetStream::Client.new("user", "secret").sample do |s|
-		      message = {}
-		      message["username"] = s.user.screen_name
-		      message["text"]     = s.text
-		      send_message message
-		    end
-		  end
+  def perform
+    TweetStream::Client.new("user", "secret").sample do |s|
+      message = {}
+      message["username"] = s.user.screen_name
+      message["text"]     = s.text
+      send_message message
+    end
+  end
 
-		end
+end
+```
 
 ### Workers
 
