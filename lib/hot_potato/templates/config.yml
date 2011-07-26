@@ -1,0 +1,11 @@
+development:
+  redis_hostname: localhost
+  redis_port: 6379
+
+test:
+  redis_hostname: localhost
+  redis_port: 6379
+
+production:
+  redis_hostname: localhost
+  redis_port: 6379

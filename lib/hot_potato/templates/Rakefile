@@ -1,0 +1,9 @@
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
+require File.expand_path('../config/boot',  __FILE__)
+
+desc 'Print the routing table'
+task :routes do
+  puts HotPotato::Route.routes.to_s
+end

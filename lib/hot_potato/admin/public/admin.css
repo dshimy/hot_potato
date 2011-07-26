@@ -1,0 +1,30 @@
+body {
+  font-family: helvetica, sans-serif;
+  font-size: 12px;
+}
+h1 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+}
+h2 {
+  margin: 0 0 5px 0;
+  font-size: 20px;
+}
+table {
+  width: 900px;
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+table tr th {
+  border: 1px solid #ccc;
+  background: #EC7800;
+  color: #fff;
+  padding: 4px;
+
+}
+table tr td {
+  border: 1px solid #ccc;
+  padding: 2px 8px;
+  text-align: center;
+}

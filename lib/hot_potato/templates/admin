@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../config/boot',  __FILE__)
+Vegas::Runner.new(HotPotato::Admin, 'Hot Potato Admin Server')

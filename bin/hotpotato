@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'hot_potato/version'
+require 'hot_potato/generate'
+
+app_path = ARGV.first
+unless app_path
+	puts "Usage: hotpotato [-v|--version] app_name"
+	exit(1)
+end
+
+puts "Hot Potato (v #{HotPotato::VERSION})"
+HotPotato::Generate.new app_path

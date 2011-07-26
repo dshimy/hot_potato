@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Hot Potato Admin Server</title>
+    <link rel='stylesheet' href='/admin.css' type='text/css' media="screen">
+    <meta http-equiv="refresh" content="30">
+  </head>
+  <body>
+    <h1>Hot Potato Admin Server</h1>
+    <h2>Machines</h2>
+    <table>
+      <tr>
+        <th>Hostname</th>
+        <th>Process ID</th>
+        <th>Started</th>
+        <th>Last Heartbeat</th>
+        <th>AppTasks</th>
+      </tr>
+      <% @machines.each do |m| %>
+      <tr>
+        <td><%= m.hostname %></td>
+        <td><%= m.pid %></td>
+        <td><%= format_date(m.started_at) %></td>
+        <td><%= format_date(m.updated_at) %></td>
+        <td><%= m.app_tasks %></td>
+      </tr>
+      <% end %>
+    </table>
+    
+    <h2>App Tasks</h2>
+    <table>
+      <tr>
+        <th>Hostname</th>
+        <th>Class</th>
+        <th>Type</th>
+        <th>Process ID</th>
+        <th>Started</th>
+        <th>Last Heartbeat</th>
+        <th>Requests In</th>
+        <th>Requests Out</th>
+      </tr>
+      <% @apptasks.each do |a| %>
+      <tr>
+        <td><%= a.hostname %></td>
+        <td><%= a.classname %></td>
+        <td><%= a.type %></td>
+        <td><%= a.pid %></td>
+        <td><%= format_date(a.started_at) %></td>
+        <td><%= format_date(a.updated_at) %></td>
+        <td><%= a.requests_in %></td>
+        <td><%= a.requests_out %></td>
+      </tr>
+      <% end %>
+    </table>
+    
+  </body>
+</html>
