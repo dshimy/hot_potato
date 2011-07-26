@@ -24,32 +24,34 @@ $ gem install hotpotato
 Next create a project:
 
 ```bash
-	$ hotpotato sample
-	Hot Potato (v0.12.1)
-	Generating application sample...
-	    create  sample
-	    add     sample/Gemfile
-	    add     sample/Rakefile
-	    create  sample/app
-	    create  sample/bin
-	    add     sample/bin/admin
-	    add     sample/bin/app_task
-	    add     sample/bin/supervisor
-	    create  sample/config
-	    add     sample/config/boot.rb
-	    add     sample/config/config.yml
-	    add     sample/config/routes.rb
-	    create  sample/docs
-	    create  sample/logs
-	    create  sample/test
-	    create  sample/tmp
+$ hotpotato sample
+Hot Potato (v0.12.1)
+Generating application sample...
+    create  sample
+    add     sample/Gemfile
+    add     sample/Rakefile
+    create  sample/app
+    create  sample/bin
+    add     sample/bin/admin
+    add     sample/bin/app_task
+    add     sample/bin/supervisor
+    create  sample/config
+    add     sample/config/boot.rb
+    add     sample/config/config.yml
+    add     sample/config/routes.rb
+    create  sample/docs
+    create  sample/logs
+    create  sample/test
+    create  sample/tmp
 ```
 
 ## Generating AppTasks
 
 To help with creating AppTasks, there is a generator available:
 
-		$ bin/generate [faucet|worker|sink] name
+```bash
+$ bin/generate [faucet|worker|sink] name
+```
 
 # The Details
 
