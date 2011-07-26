@@ -215,5 +215,5 @@ If you have a bug, file it in GitHub.
 
 # Contributing
 
-[Fork the project](http://github.com/dshimy/hot-potato) and send pull requests.
+[Fork the project](http://github.com/dshimy/HotPotato) and send pull requests.
 
