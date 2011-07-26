@@ -17,29 +17,33 @@ Hot Potato is an open source real-time processing framework written in Ruby. Ori
 
 Start by downloading the gem (this requires Ruby 1.9):
 
-		$ gem install hotpotato
+```bash
+$ gem install hotpotato
+```
 
 Next create a project:
 
-		$ hotpotato sample
-		Hot Potato (v0.12.1)
-		Generating application sample...
-		    create  sample
-		    add     sample/Gemfile
-		    add     sample/Rakefile
-		    create  sample/app
-		    create  sample/bin
-		    add     sample/bin/admin
-		    add     sample/bin/app_task
-		    add     sample/bin/supervisor
-		    create  sample/config
-		    add     sample/config/boot.rb
-		    add     sample/config/config.yml
-		    add     sample/config/routes.rb
-		    create  sample/docs
-		    create  sample/logs
-		    create  sample/test
-		    create  sample/tmp
+```bash
+	$ hotpotato sample
+	Hot Potato (v0.12.1)
+	Generating application sample...
+	    create  sample
+	    add     sample/Gemfile
+	    add     sample/Rakefile
+	    create  sample/app
+	    create  sample/bin
+	    add     sample/bin/admin
+	    add     sample/bin/app_task
+	    add     sample/bin/supervisor
+	    create  sample/config
+	    add     sample/config/boot.rb
+	    add     sample/config/config.yml
+	    add     sample/config/routes.rb
+	    create  sample/docs
+	    create  sample/logs
+	    create  sample/test
+	    create  sample/tmp
+```
 
 ## Generating AppTasks
 
@@ -88,14 +92,16 @@ Data, and Filter Data.  Each worker is a ruby file in the app directory that ext
 and implements the perform(message) method.  For each message the worker wants to send to the next AppTask,
 the send_message method should be called.
 
-		class Influencer < HotPotato::Worker
-  
-		  def perform(message)
-		    message["influence"] = rand(100)
-		    send_message message
-		  end
+```ruby
+class Influencer < HotPotato::Worker
 
-		end
+  def perform(message)
+    message["influence"] = rand(100)
+    send_message message
+  end
+
+end
+```
 
 ### Sinks
 
@@ -104,13 +110,15 @@ File Writer.  Each sink is a ruby file in the app directory that extends HotPota
 the perform(message) method.  There is no send_message for the sink to call since it is a final destination
 for the message.
 
-		class LogWriter < HotPotato::Sink
-  
-		  def perform(message)
-		    log.debug "#{message["username"]}:#{message["influence"]}"
-		  end
+```ruby
+class LogWriter < HotPotato::Sink
 
-		end
+  def perform(message)
+    log.debug "#{message["username"]}:#{message["influence"]}"
+  end
+
+end
+```
 
 ## Supervisor
 
@@ -128,7 +136,9 @@ The supervisor also starts the Heartbeat service and logging service as backgrou
 
 The supervisor can be managed from the command line:
 
-    $ bin/supervisor [run|start|stop|restart]
+```bash
+$ bin/supervisor [run|start|stop|restart]
+```
 
 If started without any settings, it will default to run.
 
@@ -138,30 +148,32 @@ The admin server is a Sinatra-based application to display statistical and diagn
 
 The admin server can be managed from the command line:
 
-    $ bin/admin --help
+```bash
+$ bin/admin --help
 
-		Usage: ./admin [options]
+Usage: ./admin [options]
 
-		Vegas options:
-		  -K, --kill               kill the running process and exit
-		  -S, --status             display the current running PID and URL then quit
-		  -s, --server SERVER      serve using SERVER (thin/mongrel/webrick)
-		  -o, --host HOST          listen on HOST (default: 0.0.0.0)
-		  -p, --port PORT          use PORT (default: 5678)
-		  -x, --no-proxy           ignore env proxy settings (e.g. http_proxy)
-		  -e, --env ENVIRONMENT    use ENVIRONMENT for defaults (default: development)
-		  -F, --foreground         don't daemonize, run in the foreground
-		  -L, --no-launch          don't launch the browser
-		  -d, --debug              raise the log level to :debug (default: :info)
-		      --app-dir APP_DIR    set the app dir where files are stored (default: ~/.vegas/Hot_Potato_Admin_Server)/)
-		  -P, --pid-file PID_FILE  set the path to the pid file (default: app_dir/Hot_Potato_Admin_Server.pid)
-		      --log-file LOG_FILE  set the path to the log file (default: app_dir/Hot_Potato_Admin_Server.log)
-		      --url-file URL_FILE  set the path to the URL file (default: app_dir/Hot_Potato_Admin_Server.url)
+Vegas options:
+  -K, --kill               kill the running process and exit
+  -S, --status             display the current running PID and URL then quit
+  -s, --server SERVER      serve using SERVER (thin/mongrel/webrick)
+  -o, --host HOST          listen on HOST (default: 0.0.0.0)
+  -p, --port PORT          use PORT (default: 5678)
+  -x, --no-proxy           ignore env proxy settings (e.g. http_proxy)
+  -e, --env ENVIRONMENT    use ENVIRONMENT for defaults (default: development)
+  -F, --foreground         don't daemonize, run in the foreground
+  -L, --no-launch          don't launch the browser
+  -d, --debug              raise the log level to :debug (default: :info)
+      --app-dir APP_DIR    set the app dir where files are stored (default: ~/.vegas/Hot_Potato_Admin_Server)/)
+  -P, --pid-file PID_FILE  set the path to the pid file (default: app_dir/Hot_Potato_Admin_Server.pid)
+      --log-file LOG_FILE  set the path to the log file (default: app_dir/Hot_Potato_Admin_Server.log)
+      --url-file URL_FILE  set the path to the URL file (default: app_dir/Hot_Potato_Admin_Server.url)
 
-		Common options:
-		  -h, --help               Show this message
-		      --version            Show version
-		
+Common options:
+  -h, --help               Show this message
+      --version            Show version
+```
+	
 The page can be accessed at http://localhost:5678
 
 ## Routes
@@ -175,39 +187,49 @@ The routes file (config/routes.rb) is a Ruby DSL that does the following:
 
 Example:
 
-		HotPotato::Route.build do
+```ruby
+HotPotato::Route.build do
 
-		  faucet :twitter_faucet
-		  worker :influencer, :source => :twitter_faucet
-		  sink :log_writer, :source => :influencer
+  faucet :twitter_faucet
+  worker :influencer, :source => :twitter_faucet
+  sink :log_writer, :source => :influencer
 
-		end
+end
+```
 
 Multiple sources can be attached to a worker or sink:
 
-		worker :influencer, :source => [:twitter_faucet. :other_source]
+```ruby
+worker :influencer, :source => [:twitter_faucet. :other_source]
+```
 
 The number of instances is set to 1.  This can be changed by setting the number of instances:
 
-    worker :influencer, :source => :twitter_faucet, :instances => 2
+```ruby
+worker :influencer, :source => :twitter_faucet, :instances => 2
+```
 
 AppTasks can be limited to a specific server (or set of servers) by creating a group in the 
 config/config.yml file:
 
-		development:
-		  redis_hostname: localhost
-		  redis_port: 6379
-		  servers:
-		    - hostname: worker01
-		      group: incoming
-		      max_app_tasks: 15
-		    - hostname: worker02
-		      group: worker
-		      max_app_tasks: 15
+```yaml
+development:
+  redis_hostname: localhost
+  redis_port: 6379
+  servers:
+    - hostname: worker01
+      group: incoming
+      max_app_tasks: 15
+    - hostname: worker02
+      group: worker
+      max_app_tasks: 15
+```
 
 and specifying the group in the routes files:
 
-		faucet :twitter_faucet, :group => :incoming
+```ruby
+faucet :twitter_faucet, :group => :incoming
+```
 
 # Support
 
