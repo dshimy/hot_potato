@@ -150,7 +150,7 @@ The admin server is a Sinatra-based application to display statistical and diagn
 
 The admin server can be managed from the command line:
 
-```bash
+```
 $ bin/admin --help
 
 Usage: ./admin [options]
