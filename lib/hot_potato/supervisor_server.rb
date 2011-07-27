@@ -209,14 +209,15 @@ module HotPotato
       options.hostname      = Socket.gethostname
       options.running       = true
       
-      config["servers"].each do |server|
-        if server["hostname"] == options.hostname
-          options.max_app_tasks = server["max_app_tasks"] || MAX_APP_TASKS
-          options.group         = server["group"]         || ""
-          break
+      if config["servers"]
+        config["servers"].each do |server|
+          if server["hostname"] == options.hostname
+            options.max_app_tasks = server["max_app_tasks"] || MAX_APP_TASKS
+            options.group         = server["group"]         || ""
+            break
+          end
         end
       end
-
       return options
     end
 
