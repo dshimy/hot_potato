@@ -12,10 +12,10 @@ module HotPotato
       copy_file "Rakefile"
       mkdir "app"
       mkdir "bin"
-      copy_file "admin", 'bin'
-      copy_file "app_task", 'bin'
-      copy_file "generate", 'bin'
-      copy_file "supervisor", 'bin'
+      copy_file "admin", 'bin', 0755
+      copy_file "app_task", 'bin', 0755
+      copy_file "generate", 'bin', 0755
+      copy_file "supervisor", 'bin', 0755
       mkdir "config"
       mkdir "config/environments"
       copy_file "development.rb", 'config/environments'
@@ -40,10 +40,11 @@ module HotPotato
       end
     end
     
-    def copy_file(src, dest = "")
+    def copy_file(src, dest = "", perm = 0644)
       dest = "#{dest}/" unless dest == ""
       log "    add     #{@app_path}/#{dest}#{src}"
       FileUtils.cp "#{File.expand_path('..', __FILE__)}/templates/#{src}", "#{@app_path}/#{dest}#{src}"
+      File.chmod perm, "#{@app_path}/#{dest}#{src}"
     end
     
     def log(message)
