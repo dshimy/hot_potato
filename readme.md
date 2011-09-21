@@ -18,7 +18,7 @@ Hot Potato is an open source real-time processing framework written in Ruby. Ori
 Start by downloading the gem (this requires Ruby 1.9):
 
 ```bash
-$ gem install hotpotato
+$ gem install hot_potato
 ```
 
 Next create a project:
