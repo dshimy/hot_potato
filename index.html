@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Hot Potato by dshimy</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Hot Potato</h1>
+        <h2>Hot Potato is an open source real-time processing framework written in Ruby</h2>
+        <a href="https://github.com/dshimy/hot_potato" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>Hot Potato</h1>
+
+<p>A Real-time Processing Framework</p>
+
+<h2>Description</h2>
+
+<p>Hot Potato is an open source real-time processing framework written in Ruby. Originally designed to process the Twitter firehose at 3,000+ tweets per second, it has been extended to support any type of streaming data as input or output to the framework. The framework excels with applications such as, social media analysis, log processing, fraud prevention, spam detection, instant messaging, and many others that include the processing of streaming data.</p>
+
+<h2>What is it?</h2>
+
+<ul>
+<li>Written in Ruby (requires 1.9)</li>
+<li>Handles streaming data</li>
+<li>Designed for scale (can easily handle the twitter firehose on one server)</li>
+<li>Simple interface for writing AppTasks</li>
+</ul><h1>Getting Started</h1>
+
+<p>Start by downloading the gem (this requires Ruby 1.9):</p>
+
+<div class="highlight">
+<pre><span class="nv">$ </span>gem install hot_potato
+</pre>
+</div>
+
+
+<p>Next create a project:</p>
+
+<div class="highlight">
+<pre><span class="nv">$ </span>hotpotato sample
+Hot Potato <span class="o">(</span>v0.12.1<span class="o">)</span>
+Generating application sample...
+    create  sample
+    add     sample/Gemfile
+    add     sample/Rakefile
+    create  sample/app
+    create  sample/bin
+    add     sample/bin/admin
+    add     sample/bin/app_task
+    add     sample/bin/supervisor
+    create  sample/config
+    add     sample/config/boot.rb
+    add     sample/config/config.yml
+    add     sample/config/routes.rb
+    create  sample/docs
+    create  sample/logs
+    create  sample/test
+    create  sample/tmp
+</pre>
+</div>
+
+
+<h2>Generating AppTasks</h2>
+
+<p>To help with creating AppTasks, there is a generator available:</p>
+
+<div class="highlight">
+<pre><span class="nv">$ </span>bin/generate <span class="o">[</span>faucet|worker|sink<span class="o">]</span> name
+</pre>
+</div>
+
+
+<h1>The Details</h1>
+
+<h2>Environments</h2>
+
+<p>By setting the RACK_ENV environment variable, one can control which environment is loaded.
+By default there are three: development, test, and production.</p>
+
+<h2>AppTasks</h2>
+
+<p>AppTasks are the controllers in the framework.  The Supervisor (See below) is responsible for
+starting AppTasks.  There are three types:</p>
+
+<h3>Faucets</h3>
+
+<p>Faucets inject data into the system.  Examples include: Twitter Reader, SMTP, and Tail Log File.
+Each faucet is a ruby file in the app directory that extends HotPotato::Faucet and implements
+the perform method.  For each message received, the method should call the send_message to send
+it to the next AppTask.</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">TwitterFaucet</span> <span class="o">&lt;</span> <span class="no">HotPotato</span><span class="o">::</span><span class="no">Faucet</span>
+
+  <span class="k">def</span> <span class="nf">perform</span>
+    <span class="no">TweetStream</span><span class="o">::</span><span class="no">Client</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">"user"</span><span class="p">,</span> <span class="s2">"secret"</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+      <span class="n">message</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="n">message</span><span class="o">[</span><span class="s2">"username"</span><span class="o">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">screen_name</span>
+      <span class="n">message</span><span class="o">[</span><span class="s2">"text"</span><span class="o">]</span>     <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">text</span>
+      <span class="n">send_message</span> <span class="n">message</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<h3>Workers</h3>
+
+<p>Workers manipulate data from other workers or faucets.  Examples include: Calculate Scores, Merge 
+Data, and Filter Data.  Each worker is a ruby file in the app directory that extends HotPotato::Worker
+and implements the perform(message) method.  For each message the worker wants to send to the next AppTask,
+the send_message method should be called.</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">Influencer</span> <span class="o">&lt;</span> <span class="no">HotPotato</span><span class="o">::</span><span class="no">Worker</span>
+
+  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="n">message</span><span class="o">[</span><span class="s2">"influence"</span><span class="o">]</span> <span class="o">=</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">send_message</span> <span class="n">message</span>
+  <span class="k">end</span>
+
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<h3>Sinks</h3>
+
+<p>Sinks send data out of the system.  Examples include: WebSocket, Database (Data Warehouse), and 
+File Writer.  Each sink is a ruby file in the app directory that extends HotPotato::Sink and implements
+the perform(message) method.  There is no send_message for the sink to call since it is a final destination
+for the message.</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">LogWriter</span> <span class="o">&lt;</span> <span class="no">HotPotato</span><span class="o">::</span><span class="no">Sink</span>
+
+  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span> <span class="s2">"</span><span class="si">#{</span><span class="n">message</span><span class="o">[</span><span class="s2">"username"</span><span class="o">]</span><span class="si">}</span><span class="s2">:</span><span class="si">#{</span><span class="n">message</span><span class="o">[</span><span class="s2">"influence"</span><span class="o">]</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<h2>Supervisor</h2>
+
+<p>The supervisor is a process that runs on each machine that participates in the cluster.
+When it starts it does the following:</p>
+
+<ol>
+<li>Read the routes file</li>
+<li>Connect to the Redis server and get the appTask process ID table</li>
+<li>Acquire the global lock</li>
+<li>If a process is needed, fork a new process for AppTask</li>
+<li>Release the global lock</li>
+<li>Rinse and Repeat</li>
+</ol><p>The supervisor also starts the Heartbeat service and logging service as background threads.</p>
+
+<p>The supervisor can be managed from the command line:</p>
+
+<div class="highlight">
+<pre><span class="nv">$ </span>bin/supervisor <span class="o">[</span>run|start|stop|restart<span class="o">]</span>
+</pre>
+</div>
+
+
+<p>If started without any settings, it will default to run.</p>
+
+<h2>Admin Server</h2>
+
+<p>The admin server is a Sinatra-based application to display statistical and diagnostic information.</p>
+
+<p>The admin server can be managed from the command line:</p>
+
+<pre><code>$ bin/admin --help
+
+Usage: ./admin [options]
+
+Vegas options:
+  -K, --kill               kill the running process and exit
+  -S, --status             display the current running PID and URL then quit
+  -s, --server SERVER      serve using SERVER (thin/mongrel/webrick)
+  -o, --host HOST          listen on HOST (default: 0.0.0.0)
+  -p, --port PORT          use PORT (default: 5678)
+  -x, --no-proxy           ignore env proxy settings (e.g. http_proxy)
+  -e, --env ENVIRONMENT    use ENVIRONMENT for defaults (default: development)
+  -F, --foreground         don't daemonize, run in the foreground
+  -L, --no-launch          don't launch the browser
+  -d, --debug              raise the log level to :debug (default: :info)
+      --app-dir APP_DIR    set the app dir where files are stored (default: ~/.vegas/Hot_Potato_Admin_Server)/)
+  -P, --pid-file PID_FILE  set the path to the pid file (default: app_dir/Hot_Potato_Admin_Server.pid)
+      --log-file LOG_FILE  set the path to the log file (default: app_dir/Hot_Potato_Admin_Server.log)
+      --url-file URL_FILE  set the path to the URL file (default: app_dir/Hot_Potato_Admin_Server.url)
+
+Common options:
+  -h, --help               Show this message
+      --version            Show version
+</code></pre>
+
+<p>The page can be accessed at http://localhost:5678</p>
+
+<h2>Routes</h2>
+
+<p>The routes file (config/routes.rb) is a Ruby DSL that does the following:</p>
+
+<ul>
+<li>Defines AppTasks (Faucets, Workers, Sinks)</li>
+<li>Defines processing chain for AppTasks</li>
+<li>Restrict AppTasks to a host group</li>
+<li>Limit number of instances</li>
+</ul><p>Example:</p>
+
+<div class="highlight">
+<pre><span class="no">HotPotato</span><span class="o">::</span><span class="no">Route</span><span class="o">.</span><span class="n">build</span> <span class="k">do</span>
+
+  <span class="n">faucet</span> <span class="ss">:twitter_faucet</span>
+  <span class="n">worker</span> <span class="ss">:influencer</span><span class="p">,</span> <span class="ss">:source</span> <span class="o">=&gt;</span> <span class="ss">:twitter_faucet</span>
+  <span class="n">sink</span> <span class="ss">:log_writer</span><span class="p">,</span> <span class="ss">:source</span> <span class="o">=&gt;</span> <span class="ss">:influencer</span>
+
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>Multiple sources can be attached to a worker or sink:</p>
+
+<div class="highlight">
+<pre><span class="n">worker</span> <span class="ss">:influencer</span><span class="p">,</span> <span class="ss">:source</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:twitter_faucet</span><span class="o">.</span> <span class="ss">:other_source</span><span class="o">]</span>
+</pre>
+</div>
+
+
+<p>The number of instances is set to 1.  This can be changed by setting the number of instances:</p>
+
+<div class="highlight">
+<pre><span class="n">worker</span> <span class="ss">:influencer</span><span class="p">,</span> <span class="ss">:source</span> <span class="o">=&gt;</span> <span class="ss">:twitter_faucet</span><span class="p">,</span> <span class="ss">:instances</span> <span class="o">=&gt;</span> <span class="mi">2</span>
+</pre>
+</div>
+
+
+<p>AppTasks can be limited to a specific server (or set of servers) by creating a group in the 
+config/config.yml file:</p>
+
+<div class="highlight">
+<pre><span class="l-Scalar-Plain">development</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">redis_hostname</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">localhost</span>
+  <span class="l-Scalar-Plain">redis_port</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">6379</span>
+  <span class="l-Scalar-Plain">servers</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">hostname</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">worker01</span>
+      <span class="l-Scalar-Plain">group</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">incoming</span>
+      <span class="l-Scalar-Plain">max_app_tasks</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">15</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">hostname</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">worker02</span>
+      <span class="l-Scalar-Plain">group</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">worker</span>
+      <span class="l-Scalar-Plain">max_app_tasks</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">15</span>
+</pre>
+</div>
+
+
+<p>and specifying the group in the routes files:</p>
+
+<div class="highlight">
+<pre><span class="n">faucet</span> <span class="ss">:twitter_faucet</span><span class="p">,</span> <span class="ss">:group</span> <span class="o">=&gt;</span> <span class="ss">:incoming</span>
+</pre>
+</div>
+
+
+<h1>Support</h1>
+
+<p>If you have a question try our group: <a href="http://groups.google.com/group/hotpotato-rb">http://groups.google.com/group/hotpotato-rb</a></p>
+
+<p>If you have a bug, file it in GitHub.</p>
+
+<h1>Contributing</h1>
+
+<p><a href="http://github.com/dshimy/HotPotato">Fork the project</a> and send pull requests.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/dshimy/hot_potato/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/dshimy/hot_potato/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/dshimy/hot_potato"></a> is maintained by <a href="https://github.com/dshimy">dshimy</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
